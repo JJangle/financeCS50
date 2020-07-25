@@ -60,6 +60,7 @@ def history():
     """Show history of transactions"""
     return apology("TODO")
 
+# FINISHED LOGIN
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -112,14 +113,39 @@ def logout():
 @app.route("/quote", methods=["GET", "POST"])
 @login_required
 def quote():
-    """Get stock quote."""
-    return apology("TODO")
+    if request.method == "POST":
+        quote = lookup(request.form.get("symbol"))
+        return render_template("quoted.html", quote=quote)
+    else:
+        return render_template("quote.html")
 
+# FINSIHED REGISTER
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
-    """Register user"""
-    return apology("TODO")
+    # check if user is registering
+    if request.method == "POST":
+        if not request.form.get("username"):
+            return apology("Please Enter a Username", 403)
+
+        user = db.execute("SELECT * FROM users WHERE username = :username", username=request.form.get("username"))
+        if request.form.get("username") ==  user:
+            return apology("Username taken, please enter unique username", 403)
+
+        if not request.form.get("password"):
+            return apology("Please enter password", 403)
+
+        if request.form.get("password") != request.form.get("confirmation"):
+            return apology("Passwords do not match", 403)
+
+        db.execute("INSERT INTO users (username, hash) VALUES (:username, :password)", username=request.form.get("username"), password=generate_password_hash(request.form.get("password"), method='pbkdf2:sha256', salt_length=8))
+        return redirect("/")
+
+    # load page if GET
+    else:
+       return render_template("register.html")
+
+
 
 
 @app.route("/sell", methods=["GET", "POST"])
