@@ -50,8 +50,10 @@ def index():
 @app.route("/buy", methods=["GET", "POST"])
 @login_required
 def buy():
-    """Buy shares of stock"""
-    return apology("TODO")
+    if request.method == "POST":
+        return null
+    else:
+        return render_template("buy.html")
 
 
 @app.route("/history")
@@ -60,8 +62,7 @@ def history():
     """Show history of transactions"""
     return apology("TODO")
 
-# FINISHED LOGIN
-
+# FINISHED LOGIN----------------------------
 @app.route("/login", methods=["GET", "POST"])
 def login():
     """Log user in"""
@@ -110,6 +111,7 @@ def logout():
     return redirect("/")
 
 
+# FINSIHED QUOTE -----------------------------
 @app.route("/quote", methods=["GET", "POST"])
 @login_required
 def quote():
@@ -119,8 +121,7 @@ def quote():
     else:
         return render_template("quote.html")
 
-# FINSIHED REGISTER
-
+# FINSIHED REGISTER---------------------------------
 @app.route("/register", methods=["GET", "POST"])
 def register():
     # check if user is registering
