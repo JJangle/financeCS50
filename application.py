@@ -51,7 +51,30 @@ def index():
 @login_required
 def buy():
     if request.method == "POST":
-        return null
+        if not request.form.get("symbol"):
+            return apology("Please Enter Stock Symbol", 403)
+
+        quote = lookup(request.form.get("symbol"))
+
+        if quote == None:
+            return apology("Please Enter Stock Symbol", 403)
+
+        if int(request.form.get("shares")) < 0:
+            return apology("Please Enter Correct Amount of Shares", 403)
+
+        tPrice = quote["price"] * int(request.form.get("shares"))
+        userCash = db.execute("SELECT cash FROM users WHERE id=:user_id", user_id=session["user_id"])
+
+        if tPrice > userCash[0]["cash"]:
+            return apology("Insuffiecient Funds", 403)
+
+        total = userCash[0]["cash"] - tPrice
+
+        db.execute("UPDATE users SET cash = :total WHERE id=:user_id", user_id=session["user_id"], total=total )
+        db.execute("INSERT INTO buy (stock, shares, cost, id) VALUES (:stock, :share, :cost, :user_id)", stock=request.form.get("symbol"), share=int(request.form.get("shares")), cost=quote["price"], user_id=session["user_id"])
+
+        return redirect("/")
+
     else:
         return render_template("buy.html")
 
